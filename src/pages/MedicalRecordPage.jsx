@@ -22,7 +22,7 @@ const MedicalRecordPage = ({ navigate, pet }) => {
   });
 
   if (!pet) {
-    navigate('/');
+    navigate('/dashboard');
     return null;
   }
 
