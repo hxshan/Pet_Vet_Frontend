@@ -3,11 +3,11 @@ import { LayoutDashboard, FileText, Calendar, Stethoscope } from 'lucide-react';
 import '../assets/styles/sidebar.css';
 
 function Sidebar({ currentPage, onNavigate }) {
-  const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'medical-records', label: 'Medical Records', icon: FileText },
-    { id: 'appointments', label: 'Appointments', icon: Calendar },
-  ];
+    const menuItems = [
+        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+        { id: 'medical-records', label: 'Medical Records', icon: FileText, path: '/medical-records' },
+        { id: 'appointments', label: 'Appointments', icon: Calendar, path: '/appointments' },
+    ];
 
   return (
     <aside className="sidebar">
@@ -26,21 +26,20 @@ function Sidebar({ currentPage, onNavigate }) {
       <nav className="sidebar-nav">
         <ul className="nav-list">
           {menuItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = currentPage === item.id;
-            
-            return (
-              <li key={item.id}>
+              const Icon = item.icon;
+              const isActive = currentPage === item.id;
+              
+              return (
                 <button
-                  onClick={() => onNavigate(item.id)}
+                  key={item.id}
+                  onClick={() => onNavigate(item.path)}
                   className={`nav-item ${isActive ? 'active' : ''}`}
                 >
-                  <Icon className="nav-icon" />
-                  <span className="nav-label">{item.label}</span>
+                  <Icon size={20} />
+                  <span>{item.label}</span>
                 </button>
-              </li>
-            );
-          })}
+              );
+            })}
         </ul>
       </nav>
       

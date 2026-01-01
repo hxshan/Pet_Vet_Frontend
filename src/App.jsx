@@ -1,11 +1,10 @@
 import "./App.css";
-import PetSearchPage from "./pages/PetSearchPage.jsx";
-import MedicalRecordPage from "./pages/MedicalRecordPage.jsx";
 import React, { useState, useEffect } from "react";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Sidebar from "./components/Sidebar.jsx";
+import MedicalRecords from "./pages/MedicalRecordPage.jsx";
 
 const useRouter = () => {
   // Initialize with the current pathname instead of '/'
@@ -35,7 +34,7 @@ const App = () => {
   const { route, state, navigate } = useRouter();
 
   // Pages that should show the sidebar
-  const pagesWithSidebar = ["/dashboard", "/search", "/medical-record"];
+  const pagesWithSidebar = ["/dashboard", "/search", "/medical-records"];
   const showSidebar = pagesWithSidebar.includes(route);
 
   // Render the appropriate page content
@@ -43,10 +42,8 @@ const App = () => {
     switch (route) {
       case "/dashboard":
         return <Dashboard navigate={navigate} />;
-      case "/search":
-        return <PetSearchPage navigate={navigate} />;
-      case "/medical-record":
-        return <MedicalRecordPage navigate={navigate} pet={state?.pet} />;
+      case "/medical-records":
+        return <MedicalRecords />;
       default:
         return null;
     }
