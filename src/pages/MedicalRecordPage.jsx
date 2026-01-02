@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Search, Filter, Plus, FileText, Calendar } from 'lucide-react';
 import '../assets/styles/medicalRecords.css';
+import NewRecordModal from '../components/NewRecordModal';
 
 function MedicalRecords() {
   const [searchTerm, setSearchTerm] = useState('');
+
+   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const records = [
     {
@@ -76,7 +79,7 @@ function MedicalRecords() {
           <Filter className="button-icon" />
           Filter
         </button>
-        <button className="new-record-button">
+        <button className="new-record-button" onClick={() => setIsModalOpen(true)}>
           <Plus className="button-icon" />
           New Record
         </button>
@@ -139,6 +142,7 @@ function MedicalRecords() {
           <button className="pagination-button">Next</button>
         </div>
       </div>
+      <NewRecordModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 }
