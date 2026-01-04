@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { Search, Filter, Plus, FileText, Calendar } from 'lucide-react';
 import '../assets/styles/medicalRecords.css';
 import NewRecordModal from '../components/NewRecordModal';
+import { VaccinationModal } from '../components/VaccinationModal';
 
 function MedicalRecords() {
   const [searchTerm, setSearchTerm] = useState('');
 
    const [isModalOpen, setIsModalOpen] = useState(false);
+   const [isVaccinationModalOpen, setIsVaccinationModalOpen] = useState(false);
 
   const records = [
     {
@@ -83,6 +85,12 @@ function MedicalRecords() {
           <Plus className="button-icon" />
           New Record
         </button>
+        <button className="new-record-button"
+          onClick={() => setIsVaccinationModalOpen(true)}
+        >
+          <Plus className="button-icon" />
+          New Vaccination Record
+        </button>
       </div>
 
       {/* Records Table */}
@@ -143,6 +151,7 @@ function MedicalRecords() {
         </div>
       </div>
       <NewRecordModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <VaccinationModal isOpen={isVaccinationModalOpen} onClose={() => setIsVaccinationModalOpen(false)} />
     </div>
   );
 }
