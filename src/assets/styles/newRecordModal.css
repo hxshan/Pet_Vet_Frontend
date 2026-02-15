@@ -214,8 +214,6 @@
 
 .form-input:focus {
   outline: none;
-  ring: 2px;
-  ring-color: #3b82f6;
   box-shadow: 0 0 0 2px #3b82f6;
 }
 
@@ -627,7 +625,7 @@
 /* Tests Box */
 .tests-box {
   background-color: #eef2ff;
-  border: 1px solid: #c7d2fe;
+  border: 1px solid #c7d2fe;
   border-radius: 0.5rem;
   padding: 1rem;
 }
@@ -704,4 +702,40 @@
 
 .save-button:hover {
   background-color: #1d4ed8;
+}
+
+/* QR Scan Buttons */
+.scan-button {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  background-color: #2563eb;
+  color: white;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.scan-button.secondary {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.scan-button:hover {
+  background-color: #1d4ed8;
+}
+
+.scan-button.secondary:hover {
+  background-color: #e9ecef;
+}
+
+.scan-error {
+  color: #dc2626;
+  font-size: 0.875rem;
+}
+
+.scan-video {
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  background: #000;
 }

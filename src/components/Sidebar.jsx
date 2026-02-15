@@ -1,6 +1,7 @@
 import React from 'react';
-import { LayoutDashboard, FileText, Calendar, Stethoscope } from 'lucide-react';
+import { LayoutDashboard, FileText, Calendar, Stethoscope, LogOut } from 'lucide-react';
 import '../assets/styles/sidebar.css';
+import { useAuth } from '../context/useAuth.js';
 
 function Sidebar({ currentPage, onNavigate }) {
     const menuItems = [
@@ -8,6 +9,17 @@ function Sidebar({ currentPage, onNavigate }) {
         { id: 'medical-records', label: 'Medical Records', icon: FileText, path: '/medical-records' },
         { id: 'appointments', label: 'Appointments', icon: Calendar, path: '/appointments' },
     ];
+
+  const { user, logout } = useAuth();
+
+  const displayName = user?.firstname || user?.name || user?.firstname || 'Dr. User';
+  const initials = (() => {
+    const n = displayName || '';
+    const parts = n.split(' ').filter(Boolean);
+    if (parts.length === 0) return 'DR';
+    if (parts.length === 1) return parts[0].slice(0,2).toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  })();
 
   return (
     <aside className="sidebar">
@@ -46,12 +58,19 @@ function Sidebar({ currentPage, onNavigate }) {
       <div className="sidebar-footer">
         <div className="user-profile">
           <div className="user-avatar">
-            <span className="avatar-text">DR</span>
+            <span className="avatar-text">{initials}</span>
           </div>
           <div className="user-info">
-            <p className="user-name">Dr. Sarah Johnson</p>
+            <p className="user-name">{displayName}</p>
             <p className="user-role">Veterinarian</p>
           </div>
+        </div>
+
+        <div className="sidebar-actions">
+          <button className="logout-button" onClick={() => logout()}>
+            <LogOut size={16} />
+            <span>Logout</span>
+          </button>
         </div>
       </div>
     </aside>

@@ -81,32 +81,24 @@ function Signup({ navigate }) {
     setError('');
     setSuccess('');
 
-    const { confirmPassword, ...dataToSend } = formData;
+  const { confirmPassword: _, ...dataToSend } = formData;
 
     try {
-      const response = await fetch('/api/veterinarian/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(dataToSend)
-      });
+      // Use shared api helper. Backend route for vet signup is auth/vet/signup
+      const { ok, status, data } = await (await import('../utils/api')).apiFetch('auth/vet/signup', { method: 'POST', body: dataToSend });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.message || 'Signup failed');
+      if (!ok) {
+        setError(data && data.message ? data.message : `Signup failed (${status})`);
         setLoading(false);
         return;
       }
 
       setSuccess(data.message + ' ' + (data.note || ''));
-      
       setTimeout(() => {
-        window.location.href = '/login';
-      }, 2000);
-      
+        navigate('/login');
+      }, 1200);
     } catch (err) {
+      console.error(err);
       setError('Network error. Please try again.');
       setLoading(false);
     }

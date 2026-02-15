@@ -5,6 +5,7 @@ import Signup from "./pages/Signup.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Sidebar from "./components/Sidebar.jsx";
 import MedicalRecords from "./pages/MedicalRecordPage.jsx";
+import { useAuth } from './context/useAuth.js';
 
 const useRouter = () => {
   // Initialize with the current pathname instead of '/'
@@ -31,7 +32,8 @@ const useRouter = () => {
 };
 
 const App = () => {
-  const { route, state, navigate } = useRouter();
+  const { route, navigate } = useRouter();
+  const auth = useAuth();
 
   // Pages that should show the sidebar
   const pagesWithSidebar = ["/dashboard", "/search", "/medical-records"];
@@ -62,6 +64,17 @@ const App = () => {
     return (
       <div className="app">
         <Signup navigate={navigate} />
+      </div>
+    );
+  }
+
+  const isAuthenticated = !!auth.token;
+
+  // If trying to access a protected page but not authenticated, show login
+  if (showSidebar && !isAuthenticated) {
+    return (
+      <div className="app">
+        <Login navigate={navigate} />
       </div>
     );
   }

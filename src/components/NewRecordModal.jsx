@@ -1,58 +1,220 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Search, Plus, Trash2, Upload } from 'lucide-react';
+import { X, Plus, Trash2, Upload } from 'lucide-react';
 import '../assets/styles/newRecordModal.css';
-
-
-const mockPets = [
-  { id: 'PET001', name: 'Max', species: 'Dog', breed: 'Golden Retriever', owner: { name: 'John Smith', phone: '555-0101', email: 'john@example.com' } },
-  { id: 'PET002', name: 'Luna', species: 'Cat', breed: 'Persian', owner: { name: 'Emily Davis', phone: '555-0102', email: 'emily@example.com' } },
-  { id: 'PET003', name: 'Charlie', species: 'Dog', breed: 'Beagle', owner: { name: 'Michael Brown', phone: '555-0103', email: 'michael@example.com' } },
-  { id: 'PET004', name: 'Bella', species: 'Dog', breed: 'Labrador', owner: { name: 'Sarah Wilson', phone: '555-0104', email: 'sarah@example.com' } },
-  { id: 'PET005', name: 'Whiskers', species: 'Cat', breed: 'Maine Coon', owner: { name: 'David Martinez', phone: '555-0105', email: 'david@example.com' } },
-];
-
-const mockVets = [
-  { id: 'VET001', name: 'Dr. Sarah Johnson' },
-  { id: 'VET002', name: 'Dr. Michael Chen' },
-  { id: 'VET003', name: 'Dr. Emily Rodriguez' },
-];
+import { apiFetch } from '../utils/api';
+import { useAuth } from '../context/useAuth.js';
 
 export function NewRecordModal({ isOpen, onClose }) {
-  const [petSearch, setPetSearch] = useState('');
-  const [selectedPet, setSelectedPet] = useState(null);
-  const [showPetDropdown, setShowPetDropdown] = useState(false);
+  const { user } = useAuth();
+  // petSearch removed; scanning-only flow
+  const [, setSelectedPet] = useState(null);
+  // petError/loadingPet removed; lookup uses dropdown selection
+  const [, setScanning] = useState(false);
+  const [scanError, setScanError] = useState('');
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const scanAnimationRef = useRef(null);
+  
   const [formData, setFormData] = useState({});
   const [medications, setMedications] = useState([{ id: 1 }]);
-  const dropdownRef = useRef(null);
+  // remove dropdown click handler (QR scanning replaces dropdown)
+
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowPetDropdown(false);
-      }
-    };
+    // initialize vet and visit datetime
+    if (user) {
+      const vetName = user.firstname ? `${user.firstname} ${user.lastname || ''}`.trim() : (user.name || 'Dr.');
+      setFormData((f) => ({
+        ...f,
+        vet_id: user._id,
+        vet_name: vetName,
+        visit_datetime: new Date().toISOString().slice(0,16) // YYYY-MM-DDTHH:MM for datetime-local
+      }));
+    } else {
+      setFormData((f) => ({ ...f, visit_datetime: new Date().toISOString().slice(0,16) }));
+    }
+  }, [user]);
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const filteredPets = mockPets.filter(pet => 
-    pet.id.toLowerCase().includes(petSearch.toLowerCase()) ||
-    pet.name.toLowerCase().includes(petSearch.toLowerCase()) ||
-    pet.owner.name.toLowerCase().includes(petSearch.toLowerCase())
-  );
+  // filteredPets not used when scanning by QR
 
   const handlePetSelect = (pet) => {
-    setSelectedPet(pet);
-    setPetSearch(`${pet.id} - ${pet.name} (${pet.species})`);
-    setShowPetDropdown(false);
-    setFormData({
-      ...formData,
-      pet_id: pet.id,
-      owner_name: pet.owner.name,
-      owner_phone: pet.owner.phone,
-      owner_email: pet.owner.email,
-    });
+  setSelectedPet(pet);
+    setFormData((prev) => ({
+      ...prev,
+      pet_id: pet._id,
+      petOwner: pet.owner?._id || undefined,
+      owner_name: pet.owner?.firstname ? `${pet.owner.firstname} ${pet.owner.lastname || ''}`.trim() : (pet.owner?.name || ''),
+      owner_phone: pet.owner?.phone || '',
+      owner_email: pet.owner?.email || '',
+    }));
   };
+
+  const fetchPetByToken = async (token) => {
+    setScanError('');
+    try {
+      const { ok, status, data } = await apiFetch(`pet/token/${token}`);
+      if (!ok) {
+        setScanError((data && data.message) || `Pet not found (${status})`);
+        return;
+      }
+      handlePetSelect(data.data);
+    } catch (err) {
+      console.error('fetchPetByToken error', err);
+      setScanError('Network error while fetching pet');
+    }
+  };
+
+  const stopScan = async (stream) => {
+    setScanning(false);
+    if (scanAnimationRef.current) {
+      cancelAnimationFrame(scanAnimationRef.current);
+      scanAnimationRef.current = null;
+    }
+    if (videoRef.current) {
+      const s = videoRef.current.srcObject || stream;
+      if (s && s.getTracks) {
+        s.getTracks().forEach((t) => t.stop());
+      }
+      videoRef.current.srcObject = null;
+    }
+  };
+
+  const startScan = async () => {
+    setScanError('');
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setScanError('Camera API not supported in this browser');
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+      }
+
+      // Use BarcodeDetector if available
+      const hasBarcodeDetector = typeof window.BarcodeDetector !== 'undefined';
+      const detector = hasBarcodeDetector ? new window.BarcodeDetector({ formats: ['qr_code'] }) : null;
+      // dynamic import jsQR for fallback decoding
+      let jsQR = null;
+      if (!detector) {
+        try {
+          const mod = await import('jsqr');
+          jsQR = mod.default || mod;
+        } catch (err) {
+          console.warn('jsQR not available', err);
+          jsQR = null;
+        }
+      }
+
+      const scanLoop = async () => {
+        try {
+          if (detector && videoRef.current) {
+            const results = await detector.detect(videoRef.current);
+            if (results && results.length > 0) {
+              const token = results[0].rawValue;
+              await stopScan(stream);
+              fetchPetByToken(token);
+              return;
+            }
+          } else if (videoRef.current && canvasRef.current) {
+            // Fallback: draw frame and use jsQR to decode
+            const ctx = canvasRef.current.getContext('2d');
+            const w = videoRef.current.videoWidth || 640;
+            const h = videoRef.current.videoHeight || 480;
+            canvasRef.current.width = w;
+            canvasRef.current.height = h;
+            ctx.drawImage(videoRef.current, 0, 0, w, h);
+            if (jsQR) {
+              const imageData = ctx.getImageData(0, 0, w, h);
+              const code = jsQR(imageData.data, imageData.width, imageData.height);
+              if (code && code.data) {
+                const token = code.data;
+                await stopScan(stream);
+                fetchPetByToken(token);
+                return;
+              }
+            } else {
+              // no decoder available
+              setScanError('QR scanning not supported in this browser - please enter token manually');
+              await stopScan(stream);
+              return;
+            }
+          }
+        } catch (e) {
+          console.error('Scan error', e);
+          setScanError('Error while scanning');
+          await stopScan(stream);
+          return;
+        }
+        scanAnimationRef.current = requestAnimationFrame(scanLoop);
+      };
+
+      setScanning(true);
+      scanAnimationRef.current = requestAnimationFrame(scanLoop);
+    } catch (err) {
+      console.error('Camera error', err);
+      setScanError('Could not access camera');
+    }
+  };
+
+  const handleSubmit = async () => {
+    // basic validation
+    if (!formData.pet_id) {
+      alert('Please select a pet before saving the record');
+      return;
+    }
+
+    const payload = {
+      pet: formData.pet_id,
+      petOwner: formData.petOwner,
+      visitType: formData.visit_type,
+      presentingComplaints: (formData.primary_complaint || []).map(s => ({ symptom: s })),
+      vitals: {
+        temperature: formData.temperature ? parseFloat(formData.temperature) : undefined,
+        heartRate: formData.heart_rate ? parseInt(formData.heart_rate, 10) : undefined,
+        respiratoryRate: formData.respiratory_rate ? parseInt(formData.respiratory_rate, 10) : undefined,
+        weightKg: formData.weight ? parseFloat(formData.weight) : undefined,
+        bodyConditionScore: formData.body_condition_score ? parseInt(formData.body_condition_score, 10) : undefined,
+      },
+      examFindings: {
+        eyes: formData.eyes_findings || [],
+        ears: formData.ears_findings || [],
+        skinCoat: formData.skin_findings || [],
+        additionalNotes: formData.exam_additional_notes || undefined
+      },
+      diagnosis: {
+        primary: formData.primary_diagnosis || '',
+        differentials: formData.secondary_diagnosis ? [formData.secondary_diagnosis] : [],
+        severity: formData.severity || undefined
+      },
+      proceduresPerformed: formData.procedures || [],
+      prescriptions: [], // medications table is currently uncontrolled; skip mapping for now
+      soapNotes: {
+        subjective: formData.soap_notes || ''
+      },
+      generalNotes: formData.visit_notes || ''
+    };
+
+    try {
+      const { ok, status, data } = await apiFetch('medical-record', { method: 'POST', body: payload });
+      if (!ok) {
+        const msg = (data && data.message) || `Failed to create record (${status})`;
+        alert(msg);
+        return;
+      }
+
+      // success
+      // you may want to refresh parent list via a callback in future
+      alert('Medical record created');
+      onClose();
+    } catch (err) {
+      console.error('Failed to save medical record', err);
+      alert('Network error while saving record');
+    }
+  };
+
+  // Pet lookup is handled by dropdown selection; keep search box interactive
 
   const handleFieldChange = (key, value) => {
     setFormData({ ...formData, [key]: value });
@@ -75,6 +237,16 @@ export function NewRecordModal({ isOpen, onClose }) {
     setMedications(medications.filter(med => med.id !== id));
   };
 
+  useEffect(() => {
+    // stop camera if modal closed (defer to avoid calling setState synchronously in effect)
+    if (!isOpen) setTimeout(() => stopScan(), 0);
+  }, [isOpen]);
+
+  const handleClose = async () => {
+    await stopScan();
+    onClose();
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -86,7 +258,7 @@ export function NewRecordModal({ isOpen, onClose }) {
             <h2 className="modal-title">New Medical Record</h2>
             <p className="modal-subtitle">Complete patient examination and visit details</p>
           </div>
-          <button onClick={onClose} className="close-button">
+          <button onClick={handleClose} className="close-button">
             <X className="icon-lg" />
           </button>
         </div>
@@ -100,41 +272,22 @@ export function NewRecordModal({ isOpen, onClose }) {
               Visit / Case Header
             </h3>
             <div className="form-section">
-              {/* Pet Searchable Dropdown */}
-              <div ref={dropdownRef} className="dropdown-container">
+              {/* Pet selection via QR scan or manual token */}
+              <div className="dropdown-container">
                 <label className="form-label">Pet *</label>
-                <div className="search-input-wrapper">
-                  <Search className="search-icon" />
-                  <input
-                    type="text"
-                    value={petSearch}
-                    onChange={(e) => {
-                      setPetSearch(e.target.value);
-                      setShowPetDropdown(true);
-                    }}
-                    onFocus={() => setShowPetDropdown(true)}
-                    placeholder="Search by Pet ID, name, or owner"
-                    className="search-input"
-                  />
+                <div className="scan-controls" style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                  <button type="button" onClick={startScan} className="scan-button">Open Camera</button>
+                  <button type="button" onClick={() => stopScan()} className="scan-button secondary">Stop</button>
                 </div>
-                {showPetDropdown && (
-                  <div className="dropdown-menu">
-                    {filteredPets.length > 0 ? (
-                      filteredPets.map(pet => (
-                        <button
-                          key={pet.id}
-                          onClick={() => handlePetSelect(pet)}
-                          className="dropdown-item"
-                        >
-                          <div className="dropdown-item-title">{pet.id} - {pet.name}</div>
-                          <div className="dropdown-item-subtitle">{pet.species} ({pet.breed}) - Owner: {pet.owner.name}</div>
-                        </button>
-                      ))
-                    ) : (
-                      <div className="dropdown-empty">No pets found</div>
-                    )}
-                  </div>
-                )}
+
+                {scanError && <div className="scan-error" style={{ color: 'var(--danger)', marginBottom: 8 }}>{scanError}</div>}
+
+                <div className="video-wrapper" style={{ marginBottom: 8 }}>
+                  <video ref={videoRef} className="scan-video" style={{ width: '100%', maxHeight: 320 }} muted playsInline />
+                  <canvas ref={canvasRef} style={{ display: 'none' }} />
+                </div>
+
+                {/* manual token input removed; QR scanning is primary flow */}
               </div>
 
               {/* Owner Information */}
@@ -180,16 +333,12 @@ export function NewRecordModal({ isOpen, onClose }) {
                 </div>
                 <div className="form-group">
                   <label className="form-label">Vet / Clinician</label>
-                  <select
-                    value={formData.vet_id || ''}
-                    onChange={(e) => handleFieldChange('vet_id', e.target.value)}
-                    className="form-input"
-                  >
-                    <option value="">Select vet</option>
-                    {mockVets.map(vet => (
-                      <option key={vet.id} value={vet.id}>{vet.name}</option>
-                    ))}
-                  </select>
+                  <input
+                    type="text"
+                    value={formData.vet_name || ''}
+                    readOnly
+                    className="form-input readonly"
+                  />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Visit Type</label>
@@ -563,7 +712,7 @@ export function NewRecordModal({ isOpen, onClose }) {
                         </tr>
                       </thead>
                       <tbody>
-                        {medications.map((med, index) => (
+                        {medications.map((med) => (
                           <tr key={med.id}>
                             <td>
                               <input
@@ -807,10 +956,7 @@ export function NewRecordModal({ isOpen, onClose }) {
             Cancel
           </button>
           <button
-            onClick={() => {
-              console.log('Form data:', formData);
-              onClose();
-            }}
+            onClick={handleSubmit}
             className="save-button"
           >
             Save Record

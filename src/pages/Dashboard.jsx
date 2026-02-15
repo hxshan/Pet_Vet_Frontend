@@ -1,8 +1,11 @@
 import React from 'react';
 import { Calendar, Users, DollarSign, Clock, TrendingUp, AlertCircle } from 'lucide-react';
 import '../assets/styles/dashboard.css';
+import { useAuth } from '../context/useAuth.js';
 
 function Dashboard() {
+  const { user } = useAuth();
+  const displayName = user?.firstname || user?.name || 'Dr. Johnson';
   const stats = [
     {
       id: 1,
@@ -55,7 +58,7 @@ function Dashboard() {
     <div className="dashboard-container">
       <div className="dashboard-header">
         <h1 className="dashboard-title">Dashboard</h1>
-        <p className="dashboard-subtitle">Welcome back, Dr. Johnson. Here's what's happening today.</p>
+        <p className="dashboard-subtitle">Welcome back, {displayName}. Here's what's happening today.</p>
       </div>
 
       {/* Stats Grid */}

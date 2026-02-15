@@ -147,3 +147,27 @@
   color: #6b7280;
   margin: 0;
 }
+
+/* Logout button styling to match app theme */
+.logout-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #374151;
+  font-size: 14px;
+}
+
+.logout-button:hover {
+  background-color: #f9fafb;
+  color: #dc2626;
+}
+
+.logout-button svg {
+  color: inherit;
+}

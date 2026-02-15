@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../assets/styles/login.css';
+import { useAuth } from '../context/useAuth.js';
 
 function Login({ navigate }) {
   const [formData, setFormData] = useState({
@@ -17,35 +18,25 @@ function Login({ navigate }) {
     setError('');
   };
 
+  const { login } = useAuth();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     try {
-      const response = await fetch('/api/veterinarian/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.message || 'Login failed');
+      const res = await login(formData);
+      if (!res.ok) {
+        const msg = (res.data && res.data.message) || res.error || `Login failed (${res.status || 'error'})`;
+        setError(msg);
         setLoading(false);
         return;
       }
 
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      
-      console.log('Login successful', data);
-      window.location.href = '/dashboard';
-      
+      console.log('Login successful', res.data);
+      navigate('/dashboard');
     } catch (err) {
+      console.error(err);
       setError('Network error. Please try again.');
       setLoading(false);
     }
