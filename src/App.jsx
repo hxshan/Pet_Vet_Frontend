@@ -6,6 +6,8 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Sidebar from "./components/Sidebar.jsx";
 import MedicalRecords from "./pages/MedicalRecordPage.jsx";
 import { useAuth } from './context/useAuth.js';
+import Home from "./pages/Home.jsx";
+import { Appointments } from "./pages/Appointments.jsx";
 
 const useRouter = () => {
   // Initialize with the current pathname instead of '/'
@@ -36,7 +38,7 @@ const App = () => {
   const auth = useAuth();
 
   // Pages that should show the sidebar
-  const pagesWithSidebar = ["/dashboard", "/search", "/medical-records"];
+  const pagesWithSidebar = ["/dashboard", "/search", "/medical-records","/appointments"];
   const showSidebar = pagesWithSidebar.includes(route);
 
   // Render the appropriate page content
@@ -46,12 +48,22 @@ const App = () => {
         return <Dashboard navigate={navigate} />;
       case "/medical-records":
         return <MedicalRecords />;
+      case "/appointments":
+        return <Appointments />;
       default:
         return null;
     }
   };
 
-  // If login or signup, render without sidebar
+  // Public landing page at '/'
+  if (route === "/") {
+    return (
+      <div className="app">
+        <Home navigate={navigate} />
+      </div>
+    );
+  }
+
   if (route === "/login") {
     return (
       <div className="app">

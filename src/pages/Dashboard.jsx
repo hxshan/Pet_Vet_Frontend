@@ -129,22 +129,6 @@ function Dashboard() {
           </div>
         </div>
       </div>
-
-      {/* Placeholder sections */}
-      <div className="placeholder-grid">
-        <div className="placeholder-card">
-          <div className="placeholder-content">
-            <TrendingUp className="placeholder-icon" />
-            <p>Revenue Chart Placeholder</p>
-          </div>
-        </div>
-        <div className="placeholder-card">
-          <div className="placeholder-content">
-            <Users className="placeholder-icon" />
-            <p>Patient Statistics Placeholder</p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
