@@ -5,7 +5,7 @@
   min-height: 100vh;
   min-width: 100vw;
   padding: 40px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #FB6F92 0%, #e05578 100%);
 }
 
 .login-card {
@@ -86,8 +86,8 @@
 }
 
 .form-group input:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #FB6F92;
+  box-shadow: 0 0 0 3px rgba(251, 111, 146, 0.08);
   background-color: white;
 }
 
@@ -112,23 +112,23 @@
   cursor: pointer;
   width: 16px;
   height: 16px;
-  accent-color: #667eea;
+  accent-color: #FB6F92;
 }
 
 .forgot-password {
-  color: #667eea;
+  color: #FB6F92;
   text-decoration: none;
   font-weight: 600;
   transition: color 0.3s ease;
 }
 
 .forgot-password:hover {
-  color: #764ba2;
+  color: #e05578;
   text-decoration: underline;
 }
 
 .login-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #FB6F92 0%, #e05578 100%);
   color: white;
   padding: 14px 24px;
   border: none;
@@ -142,7 +142,7 @@
 
 .login-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 25px rgba(251, 111, 146, 0.4);
 }
 
 .login-button:disabled {
@@ -158,14 +158,14 @@
 }
 
 .signup-link a {
-  color: #667eea;
+  color: #FB6F92;
   text-decoration: none;
   font-weight: 600;
   transition: color 0.3s ease;
 }
 
 .signup-link a:hover {
-  color: #764ba2;
+  color: #e05578;
   text-decoration: underline;
 }
 

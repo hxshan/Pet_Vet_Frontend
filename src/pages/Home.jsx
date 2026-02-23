@@ -281,7 +281,7 @@ export default function App({ navigate }) {
                 <li>Prescription & treatment tracking</li>
                 <li>Connect with more pet owners</li>
               </ul>
-              <button className="signup-button" onClick={() => navigate('/login')}>
+              <button className="signup-button" onClick={() => navigate('/signup')}>
                 Join as Clinic
                 <ArrowRight
                   size={18}

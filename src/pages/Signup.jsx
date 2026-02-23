@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ChevronRight, ChevronLeft, User, Briefcase, Check } from 'lucide-react';
 import '../assets/styles/signup.css';
 
@@ -15,12 +15,19 @@ function Signup({ navigate }) {
     licenseNumber: '',
     specialization: '',
     yearsOfExperience: '',
+    clinicId: '',
     clinicName: '',
     clinicAddress: ''
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  // clinic search/autocomplete state
+  const [clinicQuery, setClinicQuery] = useState('');
+  const [clinicSuggestions, setClinicSuggestions] = useState([]);
+  const [isSearchingClinics, setIsSearchingClinics] = useState(false);
+  const [selectedClinic, setSelectedClinic] = useState(null);
+  const clinicTimer = useRef(null);
 
   const handleChange = (e) => {
     setFormData({
@@ -28,6 +35,59 @@ function Signup({ navigate }) {
       [e.target.name]: e.target.value
     });
     setError('');
+  };
+
+  // when clinicName changes we treat it as search query unless a clinic is already selected
+  useEffect(() => {
+    if (!clinicQuery || clinicQuery.trim().length < 2) {
+      setClinicSuggestions([]);
+      return;
+    }
+
+    setIsSearchingClinics(true);
+    // debounce
+    if (clinicTimer.current) clearTimeout(clinicTimer.current);
+    clinicTimer.current = setTimeout(async () => {
+      try {
+        const api = (await import('../utils/api')).apiFetch;
+        const { ok, data } = await api(`clinics?q=${encodeURIComponent(clinicQuery.trim())}&limit=6`);
+        if (ok && data && Array.isArray(data.clinics)) {
+          setClinicSuggestions(data.clinics);
+        } else {
+          setClinicSuggestions([]);
+        }
+      } catch (err) {
+        console.error('Clinic search error', err);
+        setClinicSuggestions([]);
+      } finally {
+        setIsSearchingClinics(false);
+      }
+    }, 300);
+
+    return () => {
+      if (clinicTimer.current) clearTimeout(clinicTimer.current);
+    };
+  }, [clinicQuery]);
+
+  const handleSelectClinic = (clinic) => {
+    setSelectedClinic(clinic);
+    setFormData({
+      ...formData,
+      clinicId: clinic._id,
+      clinicName: clinic.name,
+      clinicAddress: clinic.address || formData.clinicAddress
+    });
+    setClinicSuggestions([]);
+    setClinicQuery('');
+  };
+
+  const clearSelectedClinic = () => {
+    setSelectedClinic(null);
+    setFormData({
+      ...formData,
+      clinicId: '',
+      // keep entered clinicName/address so user can edit
+    });
   };
 
   const validateStep1 = () => {
@@ -70,10 +130,16 @@ function Signup({ navigate }) {
   };
 
   const handleSubmit = async () => {
-    const { licenseNumber, specialization, yearsOfExperience, clinicName, clinicAddress } = formData;
-    
-    if (!licenseNumber || !specialization || !yearsOfExperience || !clinicName || !clinicAddress) {
+    const { licenseNumber, specialization, yearsOfExperience, clinicId, clinicName, clinicAddress } = formData;
+
+    // Require either an existing clinicId or new clinicName+clinicAddress
+    if (!licenseNumber || !specialization || !yearsOfExperience) {
       setError('Please fill in all required fields');
+      return;
+    }
+
+    if (!clinicId && (!clinicName || !clinicAddress)) {
+      setError('Provide an existing Clinic ID or enter Clinic Name and Address to create a clinic');
       return;
     }
 
@@ -290,27 +356,55 @@ function Signup({ navigate }) {
               </div>
 
               <div className="form-group">
-                <label htmlFor="clinicName">Clinic Name *</label>
-                <input
-                  type="text"
-                  id="clinicName"
-                  name="clinicName"
-                  value={formData.clinicName}
-                  onChange={handleChange}
-                  required
-                  placeholder="Enter clinic name"
-                />
+                <label htmlFor="clinicName">Clinic — search to join or enter details to create</label>
+                {selectedClinic ? (
+                  <div className="selected-clinic">
+                    <strong>Selected:</strong> {selectedClinic.name}
+                    <div className="selected-meta">{selectedClinic.address}</div>
+                    <button type="button" onClick={clearSelectedClinic} className="change-clinic">Change</button>
+                  </div>
+                ) : (
+                  <>
+                    <input
+                      type="text"
+                      id="clinicName"
+                      name="clinicName"
+                      value={clinicQuery || formData.clinicName}
+                      onChange={(e) => {
+                        // if user types, clear any previously selected clinic
+                        if (formData.clinicId) {
+                          setFormData({ ...formData, clinicId: '' });
+                        }
+                        setClinicQuery(e.target.value);
+                        // also update formData.clinicName so create flow works
+                        setFormData({ ...formData, clinicName: e.target.value });
+                      }}
+                      placeholder="Search clinics by name or start typing to create"
+                      autoComplete="off"
+                    />
+                    {isSearchingClinics && <div className="clinic-search-loading">Searching...</div>}
+                    {clinicSuggestions.length > 0 && (
+                      <ul className="clinic-suggestions">
+                        {clinicSuggestions.map((c) => (
+                          <li key={c._id} onClick={() => handleSelectClinic(c)}>
+                            <strong>{c.name}</strong>
+                            <div className="suggestion-address">{c.address}</div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                )}
               </div>
 
               <div className="form-group">
-                <label htmlFor="clinicAddress">Clinic Address *</label>
+                <label htmlFor="clinicAddress">Clinic Address (when creating)</label>
                 <textarea
                   id="clinicAddress"
                   name="clinicAddress"
                   value={formData.clinicAddress}
-                  onChange={handleChange}
-                  required
-                  placeholder="Enter full clinic address"
+                  onChange={(e) => setFormData({ ...formData, clinicAddress: e.target.value })}
+                  placeholder="Enter full clinic address (only required when creating a new clinic)"
                   rows="3"
                 />
               </div>

@@ -99,14 +99,14 @@
 }
 
 .cta-button-primary {
-  background-color: #ff1493;
+  background-color: #FB6F92;
   color: white;
 }
 
 .cta-button-primary:hover {
   transform: translateY(-0.125rem);
-  box-shadow: 0 0.625rem 1.5625rem rgba(255, 20, 147, 0.4);
-  background-color: #e6127f;
+  box-shadow: 0 0.625rem 1.5625rem rgba(251, 111, 146, 0.4);
+  background-color: #e05578;
 }
 
 .cta-button-secondary {
@@ -193,7 +193,7 @@
   left: 1.5rem;
   font-size: 4rem;
   font-weight: 900;
-  color: #ff1493;
+  color: #FB6F92;
   line-height: 1;
   opacity: 0.2;
   z-index: 0;
@@ -309,7 +309,7 @@
 
 .feature-card:hover {
   transform: translateY(-0.3125rem);
-  box-shadow: 0 0.5rem 1.25rem rgba(255, 20, 147, 0.2);
+  box-shadow: 0 0.5rem 1.25rem rgba(251, 111, 146, 0.2);
 }
 
 /* How It Works Section */
@@ -334,7 +334,7 @@
 .step-number {
   width: 3.75rem;
   height: 3.75rem;
-  background: #ff1493;
+  background: #FB6F92;
   color: white;
   border-radius: 50%;
   display: flex;
@@ -438,7 +438,7 @@
 
 .registration-card:hover {
   background: white;
-  box-shadow: 0 0.75rem 2.5rem rgba(255, 20, 147, 0.15);
+  box-shadow: 0 0.75rem 2.5rem rgba(251, 111, 146, 0.15);
   transform: translateY(-0.5rem);
 }
 
@@ -446,18 +446,18 @@
   width: 5rem;
   height: 5rem;
   background: #fff;
-  border: 0.1875rem solid #ff1493;
+  border: 0.1875rem solid #FB6F92;
   border-radius: 1.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 1.5625rem;
-  color: #ff1493;
+  color: #FB6F92;
   transition: all 0.3s ease;
 }
 
 .registration-card:hover .registration-icon {
-  background: #ff1493;
+  background: #FB6F92;
   color: white;
   transform: rotate(5deg) scale(1.1);
 }
@@ -495,7 +495,7 @@
 
 .registration-card-features li::before {
   content: '✓';
-  color: #ff1493;
+  color: #FB6F92;
   font-weight: bold;
   font-size: 1.2rem;
   flex-shrink: 0;
@@ -521,9 +521,9 @@
 }
 
 .signup-button:hover {
-  background: #e6127f;
+  background: #e05578;
   transform: translateY(-0.125rem);
-  box-shadow: 0 0.5rem 1.25rem rgba(255, 20, 147, 0.3);
+  box-shadow: 0 0.5rem 1.25rem rgba(251, 111, 146, 0.3);
 }
 
 .signup-button-icon {
@@ -569,7 +569,7 @@
 }
 
 .footer-link:hover {
-  color: #ff1493;
+  color: #FB6F92;
 }
 
 /* Responsive Design - Tablet and Up */
