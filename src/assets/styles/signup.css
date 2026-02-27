@@ -254,6 +254,24 @@
   background: #f9fafb;
 }
 
+.help-text {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.help-text.success {
+  color: #16a34a;
+}
+
+.clinic-map-inline {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.clinic-map-inline #mapCanvas {
+  cursor: crosshair;
+}
+
 .button-row {
   display: flex;
   gap: 12px;

@@ -22,11 +22,6 @@ function Signup({ navigate }) {
     clinicLng: null,
     clinicPlaceId: ''
   });
-  // default clinicMode: 'join' or 'create'
-  useEffect(() => {
-    if (!formData.clinicMode) setFormData(prev => ({ ...prev, clinicMode: 'join' }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -78,30 +73,18 @@ function Signup({ navigate }) {
       if (!mapEl) return;
       const map = new window.google.maps.Map(mapEl, {
         center,
-        zoom: 13
+        zoom: 13,
+        gestureHandling: 'greedy',
+        fullscreenControl: false
       });
       mapRef.current = map;
 
-      // create marker at center (or reuse existing)
-      const marker = new window.google.maps.Marker({
-        position: center,
-        map,
-        draggable: true
-      });
-      markerRef.current = marker;
-
-      // click to move marker
-      map.addListener('click', (e) => {
-        if (markerRef.current) markerRef.current.setPosition(e.latLng);
-      });
-
-      // if marker dragged, reverse-geocode and update address
       const geocoder = new window.google.maps.Geocoder();
-      marker.addListener('dragend', () => {
+
+      const updateLocationFromLatLng = (latLng) => {
         try {
-          const pos = markerRef.current.getPosition();
-              const lat = pos.lat(); 
-          const lng = pos.lng();
+          const lat = typeof latLng.lat === 'function' ? latLng.lat() : latLng.lat;
+          const lng = typeof latLng.lng === 'function' ? latLng.lng() : latLng.lng;
           setFormData(prev => ({ ...prev, clinicLat: lat, clinicLng: lng }));
           geocoder.geocode({ location: { lat, lng } }, (results, status) => {
             if (status === 'OK' && results && results[0]) {
@@ -111,7 +94,53 @@ function Signup({ navigate }) {
         } catch {
           // ignore
         }
+      };
+
+      // create marker at center (or reuse existing)
+      const marker = new window.google.maps.Marker({
+        position: center,
+        map,
+        draggable: true
       });
+      markerRef.current = marker;
+
+      map.addListener('click', (e) => {
+        try {
+          if (!markerRef.current) {
+            markerRef.current = new window.google.maps.Marker({ position: e.latLng, map, draggable: true });
+            markerRef.current.addListener('dragend', () => updateLocationFromLatLng(markerRef.current.getPosition()));
+          } else {
+            markerRef.current.setPosition(e.latLng);
+          }
+          updateLocationFromLatLng(e.latLng);
+        } catch {
+          // ignore
+        }
+      });
+
+      
+      marker.addListener('dragend', () => {
+        try {
+          updateLocationFromLatLng(markerRef.current.getPosition());
+        } catch {
+          // ignore
+        }
+      });
+
+      // improve UX: add a subtle overlay instruction
+      const instr = document.createElement('div');
+      instr.style.position = 'absolute';
+      instr.style.top = '10px';
+      instr.style.left = '10px';
+      instr.style.padding = '6px 10px';
+      instr.style.background = 'rgba(255,255,255,0.9)';
+      instr.style.borderRadius = '6px';
+      instr.style.fontSize = '13px';
+      instr.style.color = '#374151';
+      instr.style.boxShadow = '0 2px 6px rgba(0,0,0,0.08)';
+      instr.innerText = 'Click map to place marker. Drag marker to fine-tune.';
+      mapEl.style.position = 'relative';
+      mapEl.appendChild(instr);
     };
 
     // default center (Colombo) if nothing else
@@ -238,6 +267,27 @@ function Signup({ navigate }) {
                 markerRef.current.setPosition(latLng);
               } else {
                 markerRef.current = new window.google.maps.Marker({ position: latLng, map: mapRef.current, draggable: true });
+                // attach drag listener to update coords/address when user drags marker after selecting from autocomplete
+                try {
+                  const geocoder = new window.google.maps.Geocoder();
+                  markerRef.current.addListener('dragend', () => {
+                    try {
+                      const pos = markerRef.current.getPosition();
+                      const la = pos.lat();
+                      const lo = pos.lng();
+                      setFormData(prev => ({ ...prev, clinicLat: la, clinicLng: lo }));
+                      geocoder.geocode({ location: { lat: la, lng: lo } }, (results, status) => {
+                        if (status === 'OK' && results && results[0]) {
+                          setFormData(prev => ({ ...prev, clinicAddress: results[0].formatted_address, clinicPlaceId: results[0].place_id || prev.clinicPlaceId }));
+                        }
+                      });
+                    } catch {
+                      // ignore
+                    }
+                  });
+                } catch {
+                  // ignore
+                }
               }
             }
           } catch {
@@ -325,6 +375,19 @@ function Signup({ navigate }) {
 
     if (!clinicId && (!clinicName || !clinicAddress)) {
       setError('Provide an existing Clinic ID or enter Clinic Name and Address to create a clinic');
+      return;
+    }
+
+    // If user is creating a new clinic (not joining), require valid coordinates (they must pick on the map or choose an address)
+    const coordsValid = (lat, lng) => {
+      const a = Number(lat);
+      const b = Number(lng);
+      return Number.isFinite(a) && Number.isFinite(b) && Math.abs(a) > 0.000001 && Math.abs(b) > 0.000001;
+    };
+
+    if (!clinicId && !coordsValid(formData.clinicLat, formData.clinicLng)) {
+      setError('Please pick a location on the map or select an address so the clinic coordinates are set.');
+      setLoading(false);
       return;
     }
 
@@ -633,11 +696,20 @@ function Signup({ navigate }) {
                         </button>
                       </div>
 
-                      {showMapPicker && (
-                        <div className="clinic-map-inline" style={{ width: '100%', height: 320, marginTop: 12 }}>
-                          <div id="mapCanvas" style={{ width: '100%', height: '100%', borderRadius: 8, border: '1px solid #e6e6e6' }} />
+                        {/* Guidance about selecting coordinates */}
+                        <div style={{ marginTop: 8 }}>
+                          {!formData.clinicLat || !formData.clinicLng ? (
+                            <div className="help-text">Please select an address from autocomplete or pick a spot on the map. Picking a map pin is required to continue.</div>
+                          ) : (
+                            <div className="help-text success">Location selected — ready to submit.</div>
+                          )}
                         </div>
-                      )}
+
+                        {showMapPicker && (
+                          <div className="clinic-map-inline" style={{ width: '100%', height: 320, marginTop: 12 }}>
+                            <div id="mapCanvas" style={{ width: '100%', height: '100%', borderRadius: 8, border: '1px solid #e6e6e6' }} />
+                          </div>
+                        )}
                     </div>
                   </div>
                 )}
