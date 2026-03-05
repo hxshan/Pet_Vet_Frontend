@@ -1,45 +1,56 @@
+﻿/* ============================================================
+   SEARCH DROPDOWN
+   ============================================================ */
 .dropdown {
-    position: absolute;
-    top: 100%;
-    left: 30px;
-    right: 30px;
-    background: white;
-    border: 1px solid #ddd;
-    border-top: none;
-    border-radius: 0 0 4px 4px;
-    max-height: 300px;
-    overflow-y: auto;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    z-index: 10;
-  }
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--color-white);
+  border: 0.0625rem solid var(--color-border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  max-height: 18.75rem;
+  overflow-y: auto;
+  box-shadow: var(--shadow-md);
+  z-index: 100;
+}
 
-  .dropdown-item {
-    padding: 12px;
-    cursor: pointer;
-    border-bottom: 1px solid #f0f0f0;
-  }
+.dropdown-item {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 0.0625rem solid var(--color-border-light);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  transition: background var(--transition-fast);
+}
 
-  .dropdown-item:hover {
-    background-color: #f8f9fa;
-  }
+.dropdown-item:hover {
+  background-color: var(--color-primary-faint);
+  color: var(--color-primary);
+}
 
-  .dropdown-item:last-child {
-    border-bottom: none;
-  }
+.dropdown-item:last-child {
+  border-bottom: none;
+}
 
-  .dropdown-item.no-results {
-    color: #7f8c8d;
-    cursor: default;
-  }
+.dropdown-item.no-results {
+  color: var(--color-text-muted);
+  cursor: default;
+  font-style: italic;
+}
 
-  .dropdown-item.no-results:hover {
-    background-color: white;
-  }
+.dropdown-item.no-results:hover {
+  background-color: var(--color-white);
+  color: var(--color-text-muted);
+}
 
-  .dropdown-item strong {
-    color: #2c3e50;
-  }
+.dropdown-item strong {
+  color: var(--color-text-primary);
+  font-weight: 700;
+}
 
-  .dropdown-item small {
-    color: #7f8c8d;
-  }
+.dropdown-item small {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}

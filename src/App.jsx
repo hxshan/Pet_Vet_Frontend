@@ -6,7 +6,6 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Sidebar from "./components/Sidebar.jsx";
 import MedicalRecords from "./pages/MedicalRecordPage.jsx";
 import { useAuth } from './context/useAuth.js';
-import Home from "./pages/Home.jsx";
 import { Appointments } from "./pages/Appointments.jsx";
 
 const useRouter = () => {
@@ -57,11 +56,14 @@ const App = () => {
 
   // Public landing page at '/'
   if (route === "/") {
-    return (
-      <div className="app">
-        <Home navigate={navigate} />
-      </div>
-    );
+    if (auth.token) {
+      // Already logged in — bounce straight to dashboard
+      navigate("/dashboard");
+    } else {
+      // Not logged in — send to login
+      navigate("/login");
+    }
+    return null;
   }
 
   if (route === "/login") {
