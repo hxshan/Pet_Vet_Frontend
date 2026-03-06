@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, FileText, Calendar, Stethoscope, LogOut } from 'lucide-react';
+import { LayoutDashboard, FileText, Calendar, Stethoscope, LogOut, Building2 } from 'lucide-react';
 import '../assets/styles/sidebar.css';
 import { useAuth } from '../context/useAuth.js';
 
@@ -8,6 +8,7 @@ function Sidebar({ currentPage, onNavigate }) {
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
         { id: 'medical-records', label: 'Medical Records', icon: FileText, path: '/medical-records' },
         { id: 'appointments', label: 'Appointments', icon: Calendar, path: '/appointments' },
+        { id: 'clinic-management', label: 'Clinic', icon: Building2, path: '/clinic-management' },
     ];
 
   const { user, logout } = useAuth();
@@ -39,7 +40,7 @@ function Sidebar({ currentPage, onNavigate }) {
         <ul className="nav-list">
           {menuItems.map((item) => {
               const Icon = item.icon;
-              const isActive = currentPage === item.id;
+              const isActive = currentPage === item.path || currentPage === item.id;
               
               return (
                 <button
