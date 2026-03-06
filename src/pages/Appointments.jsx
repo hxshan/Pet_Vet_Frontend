@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import {
   Calendar, Clock, User, Phone, Settings, Check, X,
-  AlertCircle, CheckCircle, PawPrint,
+  AlertCircle, CheckCircle, PawPrint, ClipboardList,
+  Ban, UserX, ChevronDown,
 } from 'lucide-react';
 import { AvailabilityModal } from '../components/AvailabilityModal.jsx';
 import { ToastContainer } from '../components/Toast.jsx';
@@ -18,6 +19,12 @@ export function Appointments() {
   const [loadingConfirmed,  setLoadingConfirmed]  = useState(false);
   const { toasts, toast, removeToast } = useToast();
   const auth = useAuth();
+
+  // ── Status update modal ────────────────────────────────────
+  const [statusModal, setStatusModal] = useState(null); // { apt } | null
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [vetNote, setVetNote]               = useState('');
+  const [savingStatus, setSavingStatus]     = useState(false);
 
   // ── Fetch helpers ──────────────────────────────────────────
   const fetchPending = async () => {
@@ -91,6 +98,37 @@ export function Appointments() {
     }
   };
 
+  // ── Status Update ──────────────────────────────────────────
+  const openStatusModal = (apt) => {
+    setStatusModal(apt);
+    setSelectedStatus('');
+    setVetNote('');
+  };
+
+  const closeStatusModal = () => {
+    setStatusModal(null);
+    setSelectedStatus('');
+    setVetNote('');
+  };
+
+  const handleStatusUpdate = async () => {
+    if (!selectedStatus || !statusModal) return;
+    setSavingStatus(true);
+    const res = await apiFetch(`appointments/${statusModal._id || statusModal.id}/status`, {
+      method: 'PATCH',
+      body: { status: selectedStatus, ...(vetNote.trim() ? { vetNote: vetNote.trim() } : {}) },
+    });
+    setSavingStatus(false);
+    if (res.ok) {
+      const labels = { COMPLETED: 'completed', CANCELLED: 'cancelled', NO_SHOW: 'marked as no-show' };
+      toast.success(`Appointment ${labels[selectedStatus] || 'updated'}.`);
+      closeStatusModal();
+      await Promise.all([fetchPending(), fetchConfirmed()]);
+    } else {
+      toast.error(res.data?.message || 'Failed to update appointment status.');
+    }
+  };
+
   const isLoading  = loadingPending || loadingConfirmed;
   const totalCount = pendingRequests.length + upcomingConfirmed.length;
 
@@ -101,6 +139,13 @@ export function Appointments() {
     new Date(iso).toLocaleDateString('en-US', {
       weekday: 'short', month: 'short', day: 'numeric',
     });
+
+  /* ── Status option config ── */
+  const STATUS_OPTIONS = [
+    { value: 'COMPLETED', label: 'Completed',  icon: CheckCircle, cls: 'status-opt--completed' },
+    { value: 'CANCELLED', label: 'Cancelled',  icon: Ban,         cls: 'status-opt--cancelled' },
+    { value: 'NO_SHOW',   label: 'No Show',    icon: UserX,       cls: 'status-opt--noshow'    },
+  ];
 
   const AppointmentCard = ({ apt, isPending }) => (
     <div className={`appt-card ${isPending ? 'appt-card--pending' : 'appt-card--confirmed'}`}>
@@ -144,17 +189,30 @@ export function Appointments() {
         <div className="appt-card__actions">
           <button
             className="appt-btn appt-btn--accept"
-            onClick={() => handleConfirm(apt.id)}
+            onClick={() => handleConfirm(apt._id || apt.id)}
           >
             <Check size={14} />
             Accept
           </button>
           <button
             className="appt-btn appt-btn--decline"
-            onClick={() => handleDecline(apt.id)}
+            onClick={() => handleDecline(apt._id || apt.id)}
           >
             <X size={14} />
             Decline
+          </button>
+        </div>
+      )}
+
+      {!isPending && (
+        <div className="appt-card__actions">
+          <button
+            className="appt-btn appt-btn--status"
+            onClick={() => openStatusModal(apt)}
+          >
+            <ClipboardList size={14} />
+            Update Status
+            <ChevronDown size={13} />
           </button>
         </div>
       )}
@@ -284,6 +342,72 @@ export function Appointments() {
           fetchConfirmed();
         }}
       />
+
+      {/* ── Status Update Modal ── */}
+      {statusModal && (
+        <div className="appt-status-overlay" onClick={closeStatusModal}>
+          <div className="appt-status-modal" onClick={e => e.stopPropagation()}>
+            <div className="appt-status-modal__header">
+              <div>
+                <h2 className="appt-status-modal__title">Update Appointment Status</h2>
+                <p className="appt-status-modal__sub">
+                  {statusModal.pet?.name || 'Patient'} &mdash; {fmtDate(statusModal.startTime)} at {fmtTime(statusModal.startTime)}
+                </p>
+              </div>
+              <button className="appt-status-modal__close" onClick={closeStatusModal}>
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="appt-status-modal__body">
+              <p className="appt-status-modal__label">Select outcome</p>
+              <div className="appt-status-opts">
+                {STATUS_OPTIONS.map(opt => {
+                  const Icon = opt.icon;
+                  return (
+                    <button
+                      key={opt.value}
+                      className={`appt-status-opt ${opt.cls}${selectedStatus === opt.value ? ' appt-status-opt--active' : ''}`}
+                      onClick={() => setSelectedStatus(opt.value)}
+                    >
+                      <Icon size={18} />
+                      <span>{opt.label}</span>
+                      {selectedStatus === opt.value && <Check size={14} className="appt-status-opt__check" />}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="appt-status-modal__note">
+                <label className="appt-status-modal__label" htmlFor="vetNote">
+                  Vet note <span className="appt-status-modal__optional">(optional)</span>
+                </label>
+                <textarea
+                  id="vetNote"
+                  className="appt-status-modal__textarea"
+                  rows={3}
+                  placeholder="Add any notes for this appointment…"
+                  value={vetNote}
+                  onChange={e => setVetNote(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="appt-status-modal__footer">
+              <button className="appt-btn appt-btn--ghost" onClick={closeStatusModal} disabled={savingStatus}>
+                Cancel
+              </button>
+              <button
+                className="appt-btn appt-btn--primary"
+                onClick={handleStatusUpdate}
+                disabled={!selectedStatus || savingStatus}
+              >
+                {savingStatus ? 'Saving…' : 'Save Status'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
