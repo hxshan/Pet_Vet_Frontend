@@ -6,7 +6,7 @@
 .availability-modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(26, 10, 20, 0.55);
+  background-color: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -112,8 +112,8 @@
   padding: 1.25rem;
 }
 
-.section-blue   { background-color: var(--color-primary-faint); border-color: var(--color-primary-subtle); }
-.section-white  { background-color: var(--color-white); border-color: var(--color-border-light); }
+.section-blue   { background-color: var(--color-surface); border-color: var(--color-border); }
+.section-white  { background-color: var(--color-white); border-color: var(--color-border); }
 
 .section-title {
   color: var(--color-text-primary);
@@ -203,10 +203,10 @@
 
 .form-input.readonly,
 .form-input:disabled {
-  background-color: var(--color-surface-alt);
+  background-color: var(--color-surface);
   color: var(--color-text-muted);
   cursor: not-allowed;
-  border-color: var(--color-border-light);
+  border-color: var(--color-border);
 }
 
 .form-input::placeholder,
@@ -270,8 +270,8 @@
 .dropdown-item:last-child { border-bottom: none; }
 
 .dropdown-item:hover {
-  background-color: var(--color-primary-faint);
-  color: var(--color-primary);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
 }
 
 .dropdown-item-title   { color: var(--color-text-primary); font-size: var(--text-sm); font-weight: 600; }
@@ -320,9 +320,9 @@
 }
 
 .checkbox-label:hover {
-  background-color: var(--color-primary-faint);
-  border-color: var(--color-primary-subtle);
-  color: var(--color-primary);
+  background-color: var(--color-surface);
+  border-color: var(--color-text-muted);
+  color: var(--color-text-primary);
 }
 
 .checkbox-input {
@@ -372,10 +372,10 @@
 @media (min-width: 64em) { .exam-grid { grid-template-columns: repeat(3, 1fr); } }
 
 .exam-card {
-  border: 0.0625rem solid var(--color-border-light);
+  border: 0.0625rem solid var(--color-border);
   border-radius: var(--radius-md);
   padding: 1rem;
-  background-color: var(--color-surface-alt);
+  background-color: var(--color-surface);
 }
 
 .exam-card-title {
@@ -433,14 +433,14 @@
 .medications-table { width: 100%; border-collapse: collapse; }
 
 .medications-table thead {
-  background-color: var(--color-primary-faint);
+  background-color: var(--color-surface);
 }
 
 .medications-table th {
   padding: 0.625rem 1rem;
   text-align: left;
   font-size: var(--text-xs);
-  color: var(--color-primary-dark);
+  color: var(--color-text-secondary);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -453,7 +453,7 @@
   transition: background var(--transition-fast);
 }
 
-.medications-table tbody tr:hover { background-color: var(--color-primary-faint); }
+.medications-table tbody tr:hover { background-color: var(--color-surface); }
 
 .medications-table td { padding: 0.5rem 1rem; }
 
@@ -547,8 +547,8 @@
   justify-content: flex-end;
   gap: 0.75rem;
   padding: 1.25rem 1.5rem;
-  border-top: 0.0625rem solid var(--color-border-light);
-  background-color: var(--color-primary-faint);
+  border-top: 0.0625rem solid var(--color-border);
+  background-color: var(--color-surface);
   border-radius: 0 0 var(--radius-xl) var(--radius-xl);
 }
 

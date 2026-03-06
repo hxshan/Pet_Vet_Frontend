@@ -42,7 +42,7 @@
   background: var(--color-white);
   padding: 1.5rem;
   border-radius: var(--radius-lg);
-  border: 0.0625rem solid var(--color-border-light);
+  border: 0.0625rem solid var(--color-border);
   box-shadow: var(--shadow-card);
   transition: box-shadow var(--transition-base), transform var(--transition-base);
 }
@@ -119,7 +119,7 @@
 .appointments-section {
   background: var(--color-white);
   border-radius: var(--radius-lg);
-  border: 0.0625rem solid var(--color-border-light);
+  border: 0.0625rem solid var(--color-border);
   box-shadow: var(--shadow-card);
 }
 
@@ -130,13 +130,13 @@
 .alerts-section {
   background: var(--color-white);
   border-radius: var(--radius-lg);
-  border: 0.0625rem solid var(--color-border-light);
+  border: 0.0625rem solid var(--color-border);
   box-shadow: var(--shadow-card);
 }
 
 .section-header {
   padding: 1.25rem 1.5rem;
-  border-bottom: 0.0625rem solid var(--color-border-light);
+  border-bottom: 0.0625rem solid var(--color-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -164,16 +164,17 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 1rem 1.125rem;
+  padding: 0.875rem 1.125rem;
   border-radius: var(--radius-md);
   background-color: var(--color-surface);
-  border: 0.0625rem solid var(--color-border-light);
+  border: 0.0625rem solid var(--color-border);
   transition: all var(--transition-fast);
 }
 
 .appointment-card:hover {
-  background-color: var(--color-primary-faint);
-  border-color: var(--color-primary-subtle);
+  background-color: var(--color-white);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-xs);
 }
 
 .appointment-time {
@@ -233,7 +234,7 @@
 
 .alert-high   { background-color: var(--color-danger-faint);  color: var(--color-danger);  border-color: #f9c8c3; }
 .alert-medium { background-color: var(--color-warning-faint); color: var(--color-warning); border-color: #fce4b0; }
-.alert-low    { background-color: var(--color-surface-alt);   color: var(--color-text-secondary); border-color: var(--color-border-light); }
+.alert-low    { background-color: var(--color-surface);     color: var(--color-text-secondary); border-color: var(--color-border); }
 
 .alert-content {
   display: flex;

@@ -93,7 +93,7 @@
 .appointments-stat-pill--total {
   background-color: var(--color-white);
   color: var(--color-text-secondary);
-  border-color: var(--color-border-light);
+  border-color: var(--color-border);
 }
 
 .appointments-stat-pill--pending {
@@ -123,7 +123,7 @@
 .appointments-loading-spinner {
   width: 2rem;
   height: 2rem;
-  border: 0.1875rem solid var(--color-primary-subtle);
+  border: 0.1875rem solid var(--color-border);
   border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 0.75s linear infinite;
@@ -142,7 +142,7 @@
 .appt-section {
   background-color: var(--color-white);
   border-radius: var(--radius-xl);
-  border: 0.0625rem solid var(--color-border-light);
+  border: 0.0625rem solid var(--color-border);
   box-shadow: var(--shadow-card);
   overflow: hidden;
 }
@@ -150,7 +150,7 @@
 /* Section Header */
 .appt-section__header {
   padding: 1.25rem 1.5rem;
-  border-bottom: 0.125rem solid var(--color-border-light);
+  border-bottom: 0.0625rem solid var(--color-border);
 }
 
 .appt-section__header--pending {
@@ -244,7 +244,7 @@
 /* ── Appointment Card ── */
 .appt-card {
   background-color: var(--color-white);
-  border: 0.125rem solid var(--color-border-light);
+  border: 0.0625rem solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 1.125rem;
   transition: all var(--transition-fast);
@@ -264,7 +264,7 @@
 
 .appt-card--pending:hover {
   border-left-color: var(--color-warning);
-  box-shadow: 0 0.25rem 0.75rem rgba(224, 124, 0, 0.12);
+  box-shadow: 0 0.25rem 0.75rem rgba(224, 124, 0, 0.10);
 }
 
 .appt-card--confirmed {
@@ -273,7 +273,7 @@
 
 .appt-card--confirmed:hover {
   border-left-color: var(--color-success);
-  box-shadow: 0 0.25rem 0.75rem rgba(15, 165, 110, 0.12);
+  box-shadow: 0 0.25rem 0.75rem rgba(15, 165, 110, 0.10);
 }
 
 /* Card Header */
@@ -348,9 +348,9 @@
   flex-direction: column;
   gap: 0.375rem;
   padding: 0.75rem;
-  background-color: var(--color-surface-alt);
+  background-color: var(--color-surface);
   border-radius: var(--radius-md);
-  border: 0.0625rem solid var(--color-border-light);
+  border: 0.0625rem solid var(--color-border);
 }
 
 .appt-card__detail {

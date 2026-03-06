@@ -4,6 +4,8 @@ import {
   AlertCircle, CheckCircle, PawPrint,
 } from 'lucide-react';
 import { AvailabilityModal } from '../components/AvailabilityModal.jsx';
+import { ToastContainer } from '../components/Toast.jsx';
+import { useToast } from '../components/useToast.js';
 import '../assets/styles/appointments.css';
 import { apiFetch } from '../utils/api.js';
 import { useAuth } from '../context/useAuth.js';
@@ -14,7 +16,7 @@ export function Appointments() {
   const [upcomingConfirmed, setUpcomingConfirmed] = useState([]);
   const [loadingPending,    setLoadingPending]    = useState(false);
   const [loadingConfirmed,  setLoadingConfirmed]  = useState(false);
-  const [actionError,       setActionError]       = useState(null);
+  const { toasts, toast, removeToast } = useToast();
   const auth = useAuth();
 
   // ── Fetch helpers ──────────────────────────────────────────
@@ -64,18 +66,17 @@ export function Appointments() {
 
   // ── Actions ────────────────────────────────────────────────
   const handleConfirm = async (id) => {
-    setActionError(null);
     const res = await apiFetch(`appointments/${id}/confirm`, { method: 'POST' });
     if (res.ok) {
       setPendingRequests(prev => prev.filter(a => a._id !== id));
       await Promise.all([fetchPending(), fetchConfirmed()]);
+      toast.success('Appointment confirmed successfully.');
     } else {
-      setActionError(res.data?.message || 'Failed to confirm appointment.');
+      toast.error(res.data?.message || 'Failed to confirm appointment.');
     }
   };
 
   const handleDecline = async (id) => {
-    setActionError(null);
     const reason = window.prompt('Optional reason for declining (shown to owner):');
     const res = await apiFetch(`appointments/${id}/decline`, {
       method: 'POST',
@@ -84,8 +85,9 @@ export function Appointments() {
     if (res.ok) {
       setPendingRequests(prev => prev.filter(a => a._id !== id));
       await fetchPending();
+      toast.info('Appointment declined.');
     } else {
-      setActionError(res.data?.message || 'Failed to decline appointment.');
+      toast.error(res.data?.message || 'Failed to decline appointment.');
     }
   };
 
@@ -197,17 +199,6 @@ export function Appointments() {
         </div>
       </div>
 
-      {/* Error Banner */}
-      {actionError && (
-        <div className="appt-error-banner">
-          <AlertCircle size={16} />
-          <span>{actionError}</span>
-          <button className="appt-error-dismiss" onClick={() => setActionError(null)}>
-            <X size={14} />
-          </button>
-        </div>
-      )}
-
       {isLoading ? (
         <div className="appointments-loading">
           <div className="appointments-loading-spinner" />
@@ -293,6 +284,8 @@ export function Appointments() {
           fetchConfirmed();
         }}
       />
+
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
   );
 }

@@ -4,7 +4,7 @@ import '../assets/styles/newRecordModal.css';
 import { apiFetch } from '../utils/api';
 import { useAuth } from '../context/useAuth.js';
 
-export function NewRecordModal({ isOpen, onClose }) {
+export function NewRecordModal({ isOpen, onClose, onSuccess }) {
   const { user } = useAuth();
   // petSearch removed; scanning-only flow
   const [, setSelectedPet] = useState(null);
@@ -161,7 +161,7 @@ export function NewRecordModal({ isOpen, onClose }) {
   const handleSubmit = async () => {
     // basic validation
     if (!formData.pet_id) {
-      alert('Please select a pet before saving the record');
+      onSuccess?.({ type: 'error', message: 'Please select a pet before saving the record.' });
       return;
     }
 
@@ -200,17 +200,16 @@ export function NewRecordModal({ isOpen, onClose }) {
       const { ok, status, data } = await apiFetch('medical-record', { method: 'POST', body: payload });
       if (!ok) {
         const msg = (data && data.message) || `Failed to create record (${status})`;
-        alert(msg);
+        onSuccess?.({ type: 'error', message: msg });
         return;
       }
 
       // success
-      // you may want to refresh parent list via a callback in future
-      alert('Medical record created');
+      onSuccess?.({ type: 'success', message: 'Medical record created successfully.' });
       onClose();
     } catch (err) {
       console.error('Failed to save medical record', err);
-      alert('Network error while saving record');
+      onSuccess?.({ type: 'error', message: 'Network error while saving record.' });
     }
   };
 

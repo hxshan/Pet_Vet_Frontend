@@ -4,11 +4,11 @@
 .sidebar {
   width: 16rem;
   background: var(--color-white);
-  border-right: 0.0625rem solid var(--color-border-light);
+  border-right: 0.0625rem solid var(--color-border);
   display: flex;
   flex-direction: column;
   height: 100vh;
-  box-shadow: 0.125rem 0 1rem rgba(246, 49, 151, 0.06);
+  box-shadow: 0.125rem 0 0.75rem rgba(0, 0, 0, 0.06);
   position: relative;
   z-index: 10;
 }
@@ -126,8 +126,8 @@
 /* Footer */
 .sidebar-footer {
   padding: 0.875rem 0.75rem;
-  border-top: 0.0625rem solid var(--color-border-light);
-  background: var(--color-primary-faint);
+  border-top: 0.0625rem solid var(--color-border);
+  background: var(--color-surface);
 }
 
 .user-profile {

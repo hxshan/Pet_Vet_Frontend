@@ -16,7 +16,7 @@ const getTodayDate = () => {
   return today.toISOString().split('T')[0];
 };
 
-export function VaccinationModal({ isOpen, onClose }) {
+export function VaccinationModal({ isOpen, onClose, onSuccess }) {
   const [, setSelectedPet] = useState(null);
   const [scanError, setScanError] = useState('');
   const videoRef = useRef(null);
@@ -206,16 +206,15 @@ export function VaccinationModal({ isOpen, onClose }) {
 
         const res = await apiFetch('vaccination', { method: 'POST', body });
         if (res.ok) {
-          // optionally notify parent or refresh listing
+          onSuccess?.({ type: 'success', message: 'Vaccination record saved successfully.' });
           onClose();
         } else {
           console.error('Failed to save vaccination', res);
-          // show basic error to user
-          alert((res.data && res.data.message) || `Failed to save vaccination (${res.status})`);
+          onSuccess?.({ type: 'error', message: (res.data && res.data.message) || `Failed to save vaccination (${res.status})` });
         }
       } catch (err) {
         console.error('Error saving vaccination', err);
-        alert('Network error while saving vaccination');
+        onSuccess?.({ type: 'error', message: 'Network error while saving vaccination.' });
       }
     })();
   };

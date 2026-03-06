@@ -65,8 +65,8 @@
 
 /* Section Container */
 .vaccination-section-container {
-  background-color: var(--color-primary-faint);
-  border: 0.0625rem solid var(--color-primary-subtle);
+  background-color: var(--color-surface);
+  border: 0.0625rem solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 1.25rem;
 }
@@ -126,7 +126,7 @@
 }
 
 .vaccination-form-input-readonly {
-  background-color: var(--color-surface-alt);
+  background-color: var(--color-surface);
   color: var(--color-text-muted);
   cursor: not-allowed;
 }
@@ -206,8 +206,8 @@
 .vaccination-pet-dropdown-item:last-child { border-bottom: none; }
 
 .vaccination-pet-dropdown-item:hover {
-  background-color: var(--color-primary-faint);
-  color: var(--color-primary);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
 }
 
 .vaccination-pet-dropdown-name    { color: var(--color-text-primary); font-weight: 600; }
@@ -221,8 +221,8 @@
   justify-content: flex-end;
   gap: 0.75rem;
   padding: 1.25rem 1.5rem;
-  border-top: 0.0625rem solid var(--color-border-light);
-  background-color: var(--color-primary-faint);
+  border-top: 0.0625rem solid var(--color-border);
+  background-color: var(--color-surface);
   border-radius: 0 0 var(--radius-xl) var(--radius-xl);
 }
 

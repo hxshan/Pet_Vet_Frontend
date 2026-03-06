@@ -65,8 +65,8 @@
 
 /* Day Card */
 .availability-day-card {
-  background-color: var(--color-surface-alt);
-  border: 0.125rem solid var(--color-border-light);
+  background-color: var(--color-surface);
+  border: 0.0625rem solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 1.25rem;
   margin-bottom: 0.875rem;
@@ -74,13 +74,13 @@
 }
 
 .availability-day-card.active {
-  border-color: var(--color-primary-subtle);
-  background-color: var(--color-primary-faint);
+  border-color: var(--color-primary);
+  background-color: var(--color-white);
 }
 
 .availability-day-card.inactive {
   opacity: 0.55;
-  background-color: var(--color-surface-alt);
+  background-color: var(--color-surface);
 }
 
 .availability-day-header {
@@ -261,8 +261,8 @@
   justify-content: space-between;
   gap: 0.75rem;
   padding: 1.25rem 1.5rem;
-  border-top: 0.0625rem solid var(--color-border-light);
-  background-color: var(--color-primary-faint);
+  border-top: 0.0625rem solid var(--color-border);
+  background-color: var(--color-surface);
   border-radius: 0 0 var(--radius-xl) var(--radius-xl);
 }
 
