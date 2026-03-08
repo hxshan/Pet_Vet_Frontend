@@ -1,8 +1,8 @@
 const BASE =
   typeof import.meta !== "undefined" &&
   import.meta.env &&
-  import.meta.env.VITE_API_BASE
-    ? import.meta.env.VITE_API_BASE
+  import.meta.env.VITE_API_BACKEND_URL
+    ? import.meta.env.VITE_API_BACKEND_URL
     : "https://petbackend-production.up.railway.app";
 
 function buildUrl(path) {

@@ -6,8 +6,8 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Sidebar from "./components/Sidebar.jsx";
 import MedicalRecords from "./pages/MedicalRecordPage.jsx";
 import { useAuth } from './context/useAuth.js';
-import Home from "./pages/Home.jsx";
 import { Appointments } from "./pages/Appointments.jsx";
+import { ClinicPage } from "./pages/ClinicPage.jsx";
 
 const useRouter = () => {
   // Initialize with the current pathname instead of '/'
@@ -38,7 +38,7 @@ const App = () => {
   const auth = useAuth();
 
   // Pages that should show the sidebar
-  const pagesWithSidebar = ["/dashboard", "/search", "/medical-records","/appointments"];
+  const pagesWithSidebar = ["/dashboard", "/search", "/medical-records", "/appointments", "/clinic-management"];
   const showSidebar = pagesWithSidebar.includes(route);
 
   // Render the appropriate page content
@@ -50,6 +50,8 @@ const App = () => {
         return <MedicalRecords />;
       case "/appointments":
         return <Appointments />;
+      case "/clinic-management":
+        return <ClinicPage />;
       default:
         return null;
     }
@@ -57,11 +59,14 @@ const App = () => {
 
   // Public landing page at '/'
   if (route === "/") {
-    return (
-      <div className="app">
-        <Home navigate={navigate} />
-      </div>
-    );
+    if (auth.token) {
+      // Already logged in — bounce straight to dashboard
+      navigate("/dashboard");
+    } else {
+      // Not logged in — send to login
+      navigate("/login");
+    }
+    return null;
   }
 
   if (route === "/login") {

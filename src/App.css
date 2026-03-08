@@ -1,3 +1,12 @@
+/* ============================================================
+   APP SHELL LAYOUT
+   ============================================================ */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 .app {
   min-height: 100vh;
 }
@@ -5,17 +14,11 @@
 .app-layout {
   display: flex;
   height: 100vh;
-  background-color: #f9fafb;
+  background-color: var(--color-surface-alt);
 }
 
 .main-content {
   flex: 1;
   overflow: auto;
-}
-
-/* Ensure body and html take full height */
-html, body, #root {
-  height: 100%;
-  margin: 0;
-  padding: 0;
+  background-color: var(--color-surface-alt);
 }
