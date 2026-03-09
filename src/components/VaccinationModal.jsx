@@ -16,7 +16,7 @@ const getTodayDate = () => {
   return today.toISOString().split('T')[0];
 };
 
-export function VaccinationModal({ isOpen, onClose, onSuccess }) {
+export function VaccinationModal({ isOpen, onClose, onSuccess, pet }) {
   const [, setSelectedPet] = useState(null);
   const [scanError, setScanError] = useState('');
   const videoRef = useRef(null);
@@ -59,9 +59,9 @@ export function VaccinationModal({ isOpen, onClose, onSuccess }) {
 
   const selectedVaccine = vaccines && formData.vaccineId ? vaccines.find(v => v._id === formData.vaccineId) : null;
 
-  const handlePetSelect = (pet) => {
-    setSelectedPet(pet);
-    setFormData({ ...formData, pet_id: pet._id, petOwner: pet.owner?._id, owner_name: pet.owner?.firstname ? `${pet.owner.firstname} ${pet.owner.lastname || ''}`.trim() : (pet.owner?.name || ''), owner_phone: pet.owner?.phone || '', owner_email: pet.owner?.email || '' });
+  const handlePetSelect = (p) => {
+    setSelectedPet(p);
+    setFormData(prev => ({ ...prev, pet_id: p._id, petOwner: p.owner?._id, owner_name: p.owner?.firstname ? `${p.owner.firstname} ${p.owner.lastname || ''}`.trim() : (p.owner?.name || ''), owner_phone: p.owner?.phone || '', owner_email: p.owner?.email || '' }));
   };
 
   const fetchPetByToken = async (token) => {
@@ -78,6 +78,13 @@ export function VaccinationModal({ isOpen, onClose, onSuccess }) {
       setScanError('Network error while fetching pet');
     }
   };
+
+  // Pre-fill pet when opened from the Pet-by-QR tab
+  useEffect(() => {
+    if (isOpen && pet) {
+      handlePetSelect(pet);
+    }
+  }, [isOpen, pet]);
 
   const stopScan = async (stream) => {
     setScanning(false);
