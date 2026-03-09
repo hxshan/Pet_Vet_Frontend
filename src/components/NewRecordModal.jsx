@@ -4,7 +4,7 @@ import '../assets/styles/newRecordModal.css';
 import { apiFetch } from '../utils/api';
 import { useAuth } from '../context/useAuth.js';
 
-export function NewRecordModal({ isOpen, onClose, onSuccess }) {
+export function NewRecordModal({ isOpen, onClose, onSuccess, pet }) {
   const { user } = useAuth();
   // petSearch removed; scanning-only flow
   const [, setSelectedPet] = useState(null);
@@ -62,6 +62,13 @@ export function NewRecordModal({ isOpen, onClose, onSuccess }) {
       setScanError('Network error while fetching pet');
     }
   };
+
+  // Pre-fill pet when opened from the Pet-by-QR tab
+  useEffect(() => {
+    if (isOpen && pet) {
+      handlePetSelect(pet);
+    }
+  }, [isOpen, pet]);
 
   const stopScan = async (stream) => {
     setScanning(false);
@@ -399,8 +406,7 @@ export function NewRecordModal({ isOpen, onClose, onSuccess }) {
               Examination / Clinical Findings
             </h3>
             <div className="form-section-lg">
-              {/* Vital Signs */}
-              <div className="vitals-box">
+              {/* <div className="vitals-box">
                 <h4 className="subsection-title">Vital Signs</h4>
                 <div className="grid grid-5">
                   <div className="form-group">
@@ -455,15 +461,13 @@ export function NewRecordModal({ isOpen, onClose, onSuccess }) {
                     </select>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
-              {/* Physical Examination */}
               <div className="form-group">
                 <h4 className="subsection-title">Physical Examination</h4>
                 <div className="exam-grid">
-                  {/* Eyes */}
                   <div className="exam-card">
-                    <label className="exam-card-title">👁️ Eyes</label>
+                    <label className="exam-card-title">Eyes</label>
                     <div className="exam-options">
                       {['Redness', 'Discharge', 'Cloudiness', 'Other'].map(option => (
                         <label key={option} className="exam-checkbox">
@@ -479,9 +483,8 @@ export function NewRecordModal({ isOpen, onClose, onSuccess }) {
                     </div>
                   </div>
 
-                  {/* Ears */}
                   <div className="exam-card">
-                    <label className="exam-card-title">👂 Ears</label>
+                    <label className="exam-card-title">Ears</label>
                     <div className="exam-options">
                       {['Scratching', 'Discharge', 'Redness', 'Other'].map(option => (
                         <label key={option} className="exam-checkbox">
@@ -497,9 +500,8 @@ export function NewRecordModal({ isOpen, onClose, onSuccess }) {
                     </div>
                   </div>
 
-                  {/* Nose & Throat */}
                   <div className="exam-card">
-                    <label className="exam-card-title">👃 Nose & Throat</label>
+                    <label className="exam-card-title">Nose & Throat</label>
                     <div className="exam-options">
                       {['Sneezing', 'Discharge', 'Congestion', 'Other'].map(option => (
                         <label key={option} className="exam-checkbox">
@@ -515,9 +517,8 @@ export function NewRecordModal({ isOpen, onClose, onSuccess }) {
                     </div>
                   </div>
 
-                  {/* Skin & Coat */}
                   <div className="exam-card">
-                    <label className="exam-card-title">🦴 Skin & Coat</label>
+                    <label className="exam-card-title">Skin & Coat</label>
                     <div className="exam-options">
                       {['Hair Loss', 'Hot Spot', 'Red Skin', 'Flakiness', 'Other'].map(option => (
                         <label key={option} className="exam-checkbox">
@@ -533,9 +534,8 @@ export function NewRecordModal({ isOpen, onClose, onSuccess }) {
                     </div>
                   </div>
 
-                  {/* Lymph Nodes */}
                   <div className="exam-card">
-                    <label className="exam-card-title">🔬 Lymph Nodes</label>
+                    <label className="exam-card-title">Lymph Nodes</label>
                     <div className="exam-options">
                       {['Normal', 'Enlarged', 'Painful'].map(option => (
                         <label key={option} className="exam-checkbox">
@@ -551,9 +551,8 @@ export function NewRecordModal({ isOpen, onClose, onSuccess }) {
                     </div>
                   </div>
 
-                  {/* Abdomen */}
                   <div className="exam-card">
-                    <label className="exam-card-title">🫁 Abdomen</label>
+                    <label className="exam-card-title">Abdomen</label>
                     <div className="exam-options">
                       {['Soft', 'Painful', 'Masses'].map(option => (
                         <label key={option} className="exam-checkbox">
@@ -569,9 +568,8 @@ export function NewRecordModal({ isOpen, onClose, onSuccess }) {
                     </div>
                   </div>
 
-                  {/* Musculoskeletal */}
                   <div className="exam-card">
-                    <label className="exam-card-title">🦴 Musculoskeletal / Gait</label>
+                    <label className="exam-card-title">Musculoskeletal / Gait</label>
                     <div className="exam-options">
                       {['Normal', 'Lameness', 'Stiffness', 'Other'].map(option => (
                         <label key={option} className="exam-checkbox">
@@ -587,9 +585,8 @@ export function NewRecordModal({ isOpen, onClose, onSuccess }) {
                     </div>
                   </div>
 
-                  {/* Oral / Dental */}
                   <div className="exam-card">
-                    <label className="exam-card-title">🦷 Oral / Dental</label>
+                    <label className="exam-card-title">Oral / Dental</label>
                     <div className="exam-options">
                       {['Plaque', 'Tartar', 'Lesions', 'Other'].map(option => (
                         <label key={option} className="exam-checkbox">
@@ -605,9 +602,8 @@ export function NewRecordModal({ isOpen, onClose, onSuccess }) {
                     </div>
                   </div>
 
-                  {/* Neurological */}
                   <div className="exam-card">
-                    <label className="exam-card-title">🧠 Neurological</label>
+                    <label className="exam-card-title">Neurological</label>
                     <div className="exam-options">
                       {['Normal', 'Abnormal Reflexes', 'Incoordination', 'Other'].map(option => (
                         <label key={option} className="exam-checkbox">
@@ -806,7 +802,7 @@ export function NewRecordModal({ isOpen, onClose, onSuccess }) {
           </div>
 
           {/* Lab / Diagnostics Ordered */}
-          <div className="section section-white">
+          {/* <div className="section section-white">
             <h3 className="section-title">
               <div className="section-indicator section-indicator-indigo"></div>
               Lab / Diagnostics Ordered
@@ -838,10 +834,10 @@ export function NewRecordModal({ isOpen, onClose, onSuccess }) {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Lifestyle / Environmental Notes */}
-          <div className="section section-white">
+          {/* <div className="section section-white">
             <h3 className="section-title">
               <div className="section-indicator section-indicator-teal"></div>
               Lifestyle / Environmental Notes
@@ -907,7 +903,7 @@ export function NewRecordModal({ isOpen, onClose, onSuccess }) {
                 />
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Summary / Visit Notes */}
           <div className="section section-white">
@@ -936,7 +932,7 @@ export function NewRecordModal({ isOpen, onClose, onSuccess }) {
                   className="form-textarea"
                 />
               </div>
-              <div className="form-group">
+              {/* <div className="form-group">
                 <label className="form-label">Owner Instructions / Handouts</label>
                 <div className="upload-box">
                   <Upload className="upload-icon" />
@@ -944,7 +940,7 @@ export function NewRecordModal({ isOpen, onClose, onSuccess }) {
                   <p className="upload-subtext">PDF or Document files</p>
                   <input type="file" className="upload-input" multiple />
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
