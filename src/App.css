@@ -9,16 +9,33 @@ html, body, #root {
 
 .app {
   min-height: 100vh;
+  background-color: var(--color-surface-alt);
 }
 
+/* Full layout wrapper */
 .app-layout {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
   background-color: var(--color-surface-alt);
 }
 
+/* Main area: shifted right by sidebar, transitions when sidebar collapses */
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: margin-left var(--transition-base);
+}
+
+/* Page content — sits below the fixed topbar */
 .main-content {
   flex: 1;
-  overflow: auto;
+  padding-top: var(--topbar-height);
+  overflow-y: auto;
   background-color: var(--color-surface-alt);
+}
+
+.main-content-inner {
+  padding: 1.5rem;
 }

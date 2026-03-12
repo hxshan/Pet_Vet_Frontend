@@ -4,6 +4,7 @@ import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Sidebar from "./components/Sidebar.jsx";
+import Topbar from "./components/Topbar.jsx";
 import MedicalRecords from "./pages/MedicalRecordPage.jsx";
 import { useAuth } from './context/useAuth.js';
 import { Appointments } from "./pages/Appointments.jsx";
@@ -36,6 +37,9 @@ const useRouter = () => {
 const App = () => {
   const { route, navigate } = useRouter();
   const auth = useAuth();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  const toggleSidebar = () => setSidebarCollapsed(v => !v);
 
   // Pages that should show the sidebar
   const pagesWithSidebar = ["/dashboard", "/search", "/medical-records", "/appointments", "/clinic-management"];
@@ -100,10 +104,27 @@ const App = () => {
   if (showSidebar) {
     return (
       <div className="app-layout">
-        <Sidebar currentPage={route} onNavigate={navigate} />
-        <main className="main-content">
-          {renderPage()}
-        </main>
+        <Sidebar
+          currentPage={route}
+          onNavigate={navigate}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={toggleSidebar}
+        />
+        <div
+          className="main-area"
+          style={{ marginLeft: sidebarCollapsed ? 0 : 'var(--sidebar-width)' }}
+        >
+          <Topbar
+            currentPage={route}
+            sidebarCollapsed={sidebarCollapsed}
+            onToggleSidebar={toggleSidebar}
+          />
+          <main className="main-content">
+            <div className="main-content-inner">
+              {renderPage()}
+            </div>
+          </main>
+        </div>
       </div>
     );
   }
