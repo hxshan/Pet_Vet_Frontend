@@ -99,13 +99,13 @@
 .appointments-stat-pill--pending {
   background-color: var(--color-warning-faint);
   color: var(--color-warning);
-  border-color: #f3d89e;
+  border-color: rgba(251, 191, 36, 0.3);
 }
 
 .appointments-stat-pill--confirmed {
   background-color: var(--color-success-faint);
   color: var(--color-success);
-  border-color: #b3ecd8;
+  border-color: rgba(52, 211, 153, 0.3);
 }
 
 /* ── Loading State ── */
@@ -154,13 +154,13 @@
 }
 
 .appt-section__header--pending {
-  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-  border-bottom-color: #f3d89e;
+  background: rgba(251, 191, 36, 0.08);
+  border-bottom-color: rgba(251, 191, 36, 0.2);
 }
 
 .appt-section__header--confirmed {
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-  border-bottom-color: #b3ecd8;
+  background: rgba(52, 211, 153, 0.08);
+  border-bottom-color: rgba(52, 211, 153, 0.2);
 }
 
 .appt-section__title-row {
@@ -197,13 +197,15 @@
 }
 
 .appt-section__badge--pending {
-  background-color: var(--color-warning);
-  color: var(--color-white);
+  background-color: rgba(251, 191, 36, 0.2);
+  color: var(--color-warning);
+  border: 0.0625rem solid rgba(251, 191, 36, 0.3);
 }
 
 .appt-section__badge--confirmed {
-  background-color: var(--color-success);
-  color: var(--color-white);
+  background-color: rgba(52, 211, 153, 0.2);
+  color: var(--color-success);
+  border: 0.0625rem solid rgba(52, 211, 153, 0.3);
 }
 
 .appt-section__desc {
