@@ -37,7 +37,7 @@ export function RecordDetailModal({ isOpen, recordId, onClose }) {
   const fmtDate = (iso) => iso ? new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '—';
 
   return (
-    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="rdm-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="rdm-container">
         {/* Header */}
         <div className="rdm-header">

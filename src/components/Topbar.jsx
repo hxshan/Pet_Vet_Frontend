@@ -1,4 +1,5 @@
 import React from 'react';
+import { Sun, Moon } from 'lucide-react';
 
 const routeLabels = {
   '/dashboard':         'Dashboard',
@@ -17,8 +18,9 @@ function MenuIcon() {
   );
 }
 
-export default function Topbar({ currentPage, sidebarCollapsed, onToggleSidebar }) {
+export default function Topbar({ currentPage, sidebarCollapsed, onToggleSidebar, theme, onToggleTheme }) {
   const currentLabel = routeLabels[currentPage] || 'Dashboard';
+  const isLight = theme === 'light';
 
   // Build breadcrumb segments
   const segments = currentPage.split('/').filter(Boolean);
@@ -34,9 +36,11 @@ export default function Topbar({ currentPage, sidebarCollapsed, onToggleSidebar 
       left: sidebarCollapsed ? 0 : 'var(--sidebar-width)',
       right: 0,
       height: 'var(--topbar-height)',
-      background: 'rgba(9, 9, 11, 0.92)',
+      background: isLight
+        ? 'rgba(255, 255, 255, 0.92)'
+        : 'rgba(9, 9, 11, 0.92)',
       backdropFilter: 'blur(8px)',
-      borderBottom: '0.0625rem solid rgba(39, 39, 42, 0.6)',
+      borderBottom: '0.0625rem solid var(--color-border)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
@@ -57,50 +61,107 @@ export default function Topbar({ currentPage, sidebarCollapsed, onToggleSidebar 
             background: 'none',
             border: 'none',
             borderRadius: '0.5rem',
-            color: '#71717a',
+            color: 'var(--color-text-muted)',
             cursor: 'pointer',
-            transition: 'color 0.15s ease, background 0.15s ease',
+            transition: 'color var(--transition-fast), background var(--transition-fast)',
             flexShrink: 0,
           }}
-          onMouseEnter={e => { e.currentTarget.style.color = '#d4d4d8'; e.currentTarget.style.background = 'rgba(39,39,42,0.7)'; }}
-          onMouseLeave={e => { e.currentTarget.style.color = '#71717a'; e.currentTarget.style.background = 'none'; }}
+          onMouseEnter={e => {
+            e.currentTarget.style.color = 'var(--color-text-secondary)';
+            e.currentTarget.style.background = 'var(--color-surface)';
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.color = 'var(--color-text-muted)';
+            e.currentTarget.style.background = 'none';
+          }}
           title={sidebarCollapsed ? 'Open sidebar' : 'Close sidebar'}
         >
           <MenuIcon />
         </button>
 
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.625rem', color: '#52525b', fontWeight: 500, letterSpacing: '0.04em' }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.375rem',
+            fontSize: '0.625rem',
+            color: 'var(--color-text-muted)',
+            fontWeight: 500,
+            letterSpacing: '0.04em',
+          }}>
             {crumbs.map((crumb, i) => (
               <span key={crumb.path} style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-                {i > 0 && <span style={{ color: '#3f3f46' }}>/</span>}
-                <span style={{ color: i === crumbs.length - 1 ? '#a1a1aa' : '#52525b' }}>
+                {i > 0 && <span style={{ color: 'var(--color-border)' }}>/</span>}
+                <span style={{ color: i === crumbs.length - 1 ? 'var(--color-text-secondary)' : 'var(--color-text-muted)' }}>
                   {crumb.label}
                 </span>
               </span>
             ))}
           </div>
-          <h1 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#f4f4f5', letterSpacing: '-0.01em', lineHeight: 1.25 }}>
+          <h1 style={{
+            margin: 0,
+            fontSize: '1rem',
+            fontWeight: 700,
+            color: 'var(--color-text-primary)',
+            letterSpacing: '-0.01em',
+            lineHeight: 1.25,
+          }}>
             {currentLabel}
           </h1>
         </div>
       </div>
 
-      {/* Right: divider + avatar */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <div style={{ width: '1px', height: '1.5rem', background: 'rgba(39,39,42,0.8)' }} />
+      {/* Right: theme toggle + divider + avatar */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+
+        {/* Theme toggle */}
+        <button
+          onClick={onToggleTheme}
+          title={isLight ? 'Switch to dark mode' : 'Switch to light mode'}
+          style={{
+            width: '2rem',
+            height: '2rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'none',
+            border: '0.0625rem solid var(--color-border)',
+            borderRadius: '0.5rem',
+            color: 'var(--color-text-muted)',
+            cursor: 'pointer',
+            transition: 'color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast)',
+            flexShrink: 0,
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.color = 'var(--color-primary)';
+            e.currentTarget.style.background = 'var(--color-primary-faint)';
+            e.currentTarget.style.borderColor = 'var(--color-primary-subtle)';
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.color = 'var(--color-text-muted)';
+            e.currentTarget.style.background = 'none';
+            e.currentTarget.style.borderColor = 'var(--color-border)';
+          }}
+        >
+          {isLight ? <Moon size={15} /> : <Sun size={15} />}
+        </button>
+
+        {/* Divider */}
+        <div style={{ width: '1px', height: '1.5rem', background: 'var(--color-border)', margin: '0 0.25rem' }} />
+
+        {/* Avatar */}
         <div style={{
           width: '2rem',
           height: '2rem',
           borderRadius: '0.75rem',
-          background: 'linear-gradient(135deg, rgba(251,111,146,0.4) 0%, rgba(232,85,119,0.3) 100%)',
-          border: '0.0625rem solid rgba(251,111,146,0.2)',
+          background: 'var(--color-primary-faint)',
+          border: '0.0625rem solid var(--color-primary-subtle)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           flexShrink: 0,
         }}>
-          <span style={{ color: '#fb6f92', fontSize: '0.65rem', fontWeight: 700 }}>VC</span>
+          <span style={{ color: 'var(--color-primary)', fontSize: '0.65rem', fontWeight: 700 }}>VC</span>
         </div>
       </div>
     </header>

@@ -249,21 +249,44 @@
 
 /* ============================================================
    RECORD DETAIL MODAL  (rdm-*)
+   Full-screen bottom-sheet layout for tablet / laptop UX
    ============================================================ */
+
+/* Overlay — dark scrim, sheet slides up from bottom */
+.rdm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;          /* anchor sheet to bottom */
+  justify-content: center;
+  z-index: 50;
+  backdrop-filter: blur(0.15rem);
+}
+
+/* Sheet container — full width, full height minus a small top gap */
 .rdm-container {
   background: var(--color-white);
-  border-radius: var(--radius-lg);
-  max-width: 52rem;
-  width: 95vw;
-  max-height: 90vh;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;  /* rounded top corners only */
+  width: 100%;
+  max-width: 100%;
+  height: calc(100vh - 3rem);     /* leave a peek of the page behind */
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: var(--shadow-xl, 0 20px 60px rgba(0,0,0,.18));
+  box-shadow: var(--shadow-xl, 0 -20px 60px rgba(0,0,0,.18));
+  animation: rdmSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+@keyframes rdmSlideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+/* On larger screens keep content readable with a max content width centred */
 .rdm-container--narrow {
-  max-width: 38rem;
+  /* same full-sheet behaviour — no narrowing */
+  max-width: 100%;
 }
 
 /* Header */
@@ -271,9 +294,24 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.25rem 1.5rem;
+  padding: 1.25rem 2rem;
   border-bottom: 0.0625rem solid var(--color-border-light);
   background: var(--color-primary-faint);
+  flex-shrink: 0;
+  /* drag handle hint */
+  position: relative;
+}
+
+.rdm-header::before {
+  content: '';
+  position: absolute;
+  top: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2.5rem;
+  height: 0.25rem;
+  background: var(--color-border);
+  border-radius: var(--radius-pill);
 }
 
 .rdm-header--info {
@@ -337,10 +375,15 @@
 .rdm-body {
   flex: 1;
   overflow-y: auto;
-  padding: 1.25rem 1.5rem;
+  padding: 1.5rem 2rem;
   display: flex;
   flex-direction: column;
   gap: 1.125rem;
+  /* Keep content readable on ultra-wide screens */
+  max-width: 72rem;
+  width: 100%;
+  align-self: center;
+  box-sizing: border-box;
 }
 
 /* State */
@@ -547,10 +590,17 @@
 
 /* Footer */
 .rdm-footer {
-  padding: 1rem 1.5rem;
+  padding: 1rem 2rem;
   border-top: 0.0625rem solid var(--color-border-light);
   display: flex;
   justify-content: flex-end;
+  flex-shrink: 0;
+  background: var(--color-surface);
+  /* align with body content width */
+  max-width: 72rem;
+  width: 100%;
+  align-self: center;
+  box-sizing: border-box;
 }
 
 .rdm-close-btn {
