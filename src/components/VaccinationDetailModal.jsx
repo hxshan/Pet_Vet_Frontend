@@ -40,7 +40,7 @@ export function VaccinationDetailModal({ isOpen, vaccinationId, onClose }) {
       : '—';
 
   return (
-    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="rdm-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="rdm-container rdm-container--narrow">
         {/* Header */}
         <div className="rdm-header rdm-header--info">

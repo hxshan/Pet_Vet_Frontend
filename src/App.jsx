@@ -39,6 +39,19 @@ const App = () => {
   const auth = useAuth();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
+  // ── Theme ──────────────────────────────────────────────────
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem('pv-theme') || 'light'
+  );
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('pv-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(t => t === 'light' ? 'dark' : 'light');
+  // ──────────────────────────────────────────────────────────
+
   const toggleSidebar = () => setSidebarCollapsed(v => !v);
 
   // Pages that should show the sidebar
@@ -118,6 +131,8 @@ const App = () => {
             currentPage={route}
             sidebarCollapsed={sidebarCollapsed}
             onToggleSidebar={toggleSidebar}
+            theme={theme}
+            onToggleTheme={toggleTheme}
           />
           <main className="main-content">
             <div className="main-content-inner">
